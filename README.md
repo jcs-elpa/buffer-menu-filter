@@ -2,9 +2,16 @@
 [![JCS-ELPA](https://raw.githubusercontent.com/jcs-emacs/jcs-elpa/master/badges/v/buffer-menu-filter.svg)](https://jcs-emacs.github.io/jcs-elpa/#/buffer-menu-filter)
 
 # buffer-menu-filter
-> Filter buffer-menu items
+> Filter buffer-menu items using fake header
 
 [![CI](https://github.com/jcs-elpa/buffer-menu-filter/actions/workflows/test.yml/badge.svg)](https://github.com/jcs-elpa/buffer-menu-filter/actions/workflows/test.yml)
+
+## 💾 Quickstart
+
+```el
+(leaf buffer-menu-filter
+  :hook (Buffer-menu-mode-hook . buffer-menu-filter-mode))
+```
 
 ## Contribute
 
