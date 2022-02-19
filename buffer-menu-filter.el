@@ -64,6 +64,22 @@
 (defvar buffer-menu-filter--return-delay nil
   "Record if hit return when display not ready; once it is ready we redo the action.")
 
+(defvar buffer-menu-filter--score-standard 0
+  "Standard score that minimum to reach, or else delete it.
+From scale 0 to 100.")
+
+(defvar buffer-menu-filter--done-filtering t
+  "Flag to check if done filtering.")
+
+(defvar buffer-menu-filter--filter-timer nil
+  "Store filter timer function.")
+
+(defvar buffer-menu-filter--filter-delay 0.1
+  "Filter delay time.")
+
+(defvar buffer-menu-filter--pattern ""
+  "Search pattern.")
+
 ;;
 ;; (@* "Entry" )
 ;;
@@ -114,17 +130,17 @@
   "Goto LN line number."
   (goto-char (point-min)) (forward-line (1- ln)))
 
-(defun buffer-menu-filter--window-list (query &optional type ignore-case)
+(defun buffer-menu-filter--window-list (query)
   "Return window list by it's QUERY."
   (cl-remove-if-not
    (lambda (win) (string-match-p query (buffer-name (window-buffer win))))
    (window-list)))
 
-(cl-defun buffer-menu-filter--jump-to-buffer-windows (buffer &key success error type)
+(cl-defun buffer-menu-filter--jump-to-buffer-windows (buffer &key success error)
   "Safely jump to BUFFER's window and execute SUCCESS operations.
 
 If BUFFER isn't showing; then execute ERROR operations instead."
-  (if-let ((windows (buffer-menu-filter--window-list buffer type)))
+  (if-let ((windows (buffer-menu-filter--window-list buffer)))
       (dolist (win windows)
         (with-selected-window win
           (when success (funcall success))))
@@ -150,23 +166,6 @@ If BUFFER isn't showing; then execute ERROR operations instead."
   "Backspace."
   (interactive)
   (buffer-menu-filter--input "" -1))
-
-
-(defvar buffer-menu-filter--score-standard 0
-  "Standard score that minimum to reach, or else delete it.
-From scale 0 to 100.")
-
-(defvar buffer-menu-filter--done-filtering t
-  "Flag to check if done filtering.")
-
-(defvar buffer-menu-filter--filter-timer nil
-  "Store filter timer function.")
-
-(defvar buffer-menu-filter--filter-delay 0.1
-  "Filter delay time.")
-
-(defvar buffer-menu-filter--pattern ""
-  "Search pattern.")
 
 
 ;;;###autoload
