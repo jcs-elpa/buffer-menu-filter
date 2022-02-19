@@ -6,6 +6,8 @@
 
 [![CI](https://github.com/jcs-elpa/buffer-menu-filter/actions/workflows/test.yml/badge.svg)](https://github.com/jcs-elpa/buffer-menu-filter/actions/workflows/test.yml)
 
+![demo](./etc/demo.gif)
+
 ## 💾 Quickstart
 
 ```el
