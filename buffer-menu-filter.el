@@ -191,7 +191,6 @@ If BUFFER isn't showing; then execute ERROR operations instead."
   "Do filtering the buffer list."
   (buffer-menu-filter--jump-to-buffer-windows
    diminish-buffer-menu-name
-   :type 'regex
    :success
    (lambda ()
      (let ((scoring-table (ht-create)) scoring-keys)
