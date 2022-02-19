@@ -6,7 +6,9 @@
 
 [![CI](https://github.com/jcs-elpa/buffer-menu-filter/actions/workflows/test.yml/badge.svg)](https://github.com/jcs-elpa/buffer-menu-filter/actions/workflows/test.yml)
 
-![demo](./etc/demo.gif)
+<a algin="center">
+<img src="./etc/demo.gif" />
+</a>
 
 ## 💾 Quickstart
 
