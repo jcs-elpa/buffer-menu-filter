@@ -1,1 +1,1 @@
-# buffer-menu-search
+# buffer-menu-filter
