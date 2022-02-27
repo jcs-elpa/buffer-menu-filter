@@ -1,11 +1,6 @@
-;; ========================================================================
-;; $File: prepare.el $
-;; $Date: 2022-02-27 17:30:45 $
-;; $Revision: $
-;; $Creator: Jen-Chieh Shen $
-;; $Notice: See LICENSE.txt for modification and distribution information
-;;                   Copyright © 2022 by Shen, Jen-Chieh $
-;; ========================================================================
+;;; prepare.el --- Prepration  -*- lexical-binding: t -*-
+;;; Commentary:
+;;; Code:
 
 (setq byte-compile-error-on-warn t)
 
@@ -19,3 +14,9 @@
         (nongnu       . "https://elpa.nongnu.org/nongnu/")
         (org          . "https://orgmode.org/elpa/")
         (jcs-elpa     . "https://jcs-emacs.github.io/jcs-elpa/packages/")))
+
+;; Local Variables:
+;; coding: utf-8
+;; no-byte-compile: t
+;; End:
+;;; prepare.el ends here

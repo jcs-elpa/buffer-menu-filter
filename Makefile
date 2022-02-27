@@ -12,13 +12,14 @@ TEST-FILES := $(shell ls test/buffer-menu-filter-*.el)
 ci: clean build compile
 
 build:
-	$(CASK) install
+	$(CASK) install @$(CASK) $(EMACS) -Q --batch \
+		-l "./bin/prepare.el"
 
 compile:
 	@echo "Compiling..."
 	@$(CASK) $(EMACS) -Q --batch \
 		-L . \
-		-l './bin/prepare.el' \
+		--eval '(setq byte-compile-error-on-warn t)' \
 		-f batch-byte-compile $(PKG-FILES)
 
 unix-test:
