@@ -15,6 +15,8 @@
         (org          . "https://orgmode.org/elpa/")
         (jcs-elpa     . "https://jcs-emacs.github.io/jcs-elpa/packages/")))
 
+(cask-install)
+
 ;; Local Variables:
 ;; coding: utf-8
 ;; no-byte-compile: t
