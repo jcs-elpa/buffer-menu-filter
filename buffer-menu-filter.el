@@ -71,7 +71,8 @@
   "Record if fake header already appears.")
 
 (defvar buffer-menu-filter--return-delay nil
-  "Record if hit return when display not ready; once it is ready we redo the action.")
+  "Record if hit return when display not ready; once it is ready we redo the
+action.")
 
 (defvar buffer-menu-filter--score-standard 0
   "Standard score that minimum to reach, or else delete it.
