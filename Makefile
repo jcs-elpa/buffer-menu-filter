@@ -12,8 +12,7 @@ TEST-FILES := $(shell ls test/buffer-menu-filter-*.el)
 ci: clean build compile
 
 build:
-	@echo "Installing..."
-	@$(CASK) $(EMACS) -Q --batch -l "./bin/prepare.el"
+	$(CASK) install
 
 compile:
 	@echo "Compiling..."
