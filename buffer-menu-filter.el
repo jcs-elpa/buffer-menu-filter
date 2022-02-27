@@ -63,6 +63,9 @@
   :type 'float
   :group 'buffer-menu-filter)
 
+(defconst buffer-menu-filter-name "*Buffer List*"
+  "Buffer name for *Buffer List*.")
+
 (defvar buffer-menu-filter--first-enter nil
   "Record if fake header already appears.")
 
@@ -192,7 +195,7 @@ If BUFFER isn't showing; then execute ERROR operations instead."
 (defun buffer-menu-filter--filter-list ()
   "Do filtering the buffer list."
   (buffer-menu-filter--jump-to-buffer-windows
-   diminish-buffer-menu-name
+   buffer-menu-filter-name
    :success
    (lambda ()
      (let ((scoring-table (ht-create)) scoring-keys)
