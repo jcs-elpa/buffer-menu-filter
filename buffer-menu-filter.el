@@ -58,6 +58,11 @@
     "/" "?" "|" " ")
   "List of key to bind.")
 
+(defcustom buffer-menu-filter-delay 0.2
+  "Filter delay time."
+  :type 'float
+  :group 'buffer-menu-filter)
+
 (defvar buffer-menu-filter--first-enter nil
   "Record if fake header already appears.")
 
@@ -71,11 +76,8 @@ From scale 0 to 100.")
 (defvar buffer-menu-filter--done-filtering t
   "Flag to check if done filtering.")
 
-(defvar buffer-menu-filter--filter-timer nil
+(defvar buffer-menu-filter--timer nil
   "Store filter timer function.")
-
-(defvar buffer-menu-filter--filter-delay 0.1
-  "Filter delay time.")
 
 (defvar buffer-menu-filter--pattern ""
   "Search pattern.")
@@ -244,10 +246,10 @@ If BUFFER isn't showing; then execute ERROR operations instead."
   (buffer-menu-filter--update-header-string)
   (buffer-menu-filter--safe-print-fake-header)
   (unless (string-empty-p buffer-menu-filter--pattern)
-    (setq buffer-menu-filter--filter-timer (buffer-menu-filter--kill-timer buffer-menu-filter--filter-timer)
+    (setq buffer-menu-filter--timer (buffer-menu-filter--kill-timer buffer-menu-filter--timer)
           buffer-menu-filter--done-filtering nil
-          buffer-menu-filter--filter-timer
-          (run-with-idle-timer buffer-menu-filter--filter-delay
+          buffer-menu-filter--timer
+          (run-with-idle-timer buffer-menu-filter-delay
                                nil #'buffer-menu-filter--filter-list))))
 
 (defun buffer-menu-filter--input (key-input &optional add-del-num)
