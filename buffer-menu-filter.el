@@ -7,7 +7,7 @@
 ;; Description: Filter buffer-menu items using fake header.
 ;; Keyword: buffer menu filter
 ;; Version: 0.1.0
-;; Package-Requires: ((emacs "26.1") (flx "0.6.1") (ht "2.0"))
+;; Package-Requires: ((emacs "26.1") (buffer-menu-project "0.1.0") (flx "0.6.1") (ht "2.0"))
 ;; URL: https://github.com/jcs-elpa/buffer-menu-filter
 
 ;; This file is NOT part of GNU Emacs.
@@ -35,6 +35,7 @@
 (require 'cl-lib)
 (require 'subr-x)
 
+(require 'buffer-menu-project)
 (require 'flx)
 (require 'ht)
 

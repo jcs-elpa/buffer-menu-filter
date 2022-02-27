@@ -18,7 +18,7 @@ compile:
 	@echo "Compiling..."
 	@$(CASK) $(EMACS) -Q --batch \
 		-L . \
-		--eval '(setq byte-compile-error-on-warn t)' \
+		-l './bin/prepare.el' \
 		-f batch-byte-compile $(PKG-FILES)
 
 unix-test:
