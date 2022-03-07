@@ -10,6 +10,8 @@
   <img src="./etc/demo.gif" />
 </p>
 
+Anthor way to switch to another buffer using Buffer-Menu.
+
 ## 💾 Quickstart
 
 ```el
