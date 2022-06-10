@@ -64,6 +64,11 @@
   :type 'float
   :group 'buffer-menu-filter)
 
+(defcustom buffer-menu-filter-score-fn 'flx-score
+  "Function used for scoring candidates."
+  :type 'symbol
+  :group 'buffer-menu-filter)
+
 (defconst buffer-menu-filter-name "*Buffer List*"
   "Buffer name for *Buffer List*.")
 
@@ -205,7 +210,7 @@ If BUFFER isn't showing; then execute ERROR operations instead."
          (let* ((id (tabulated-list-get-id))
                 (entry (tabulated-list-get-entry))
                 (buf-name (buffer-name id))
-                (scoring (flx-score buf-name buffer-menu-filter--pattern))
+                (scoring (funcall buffer-menu-filter-score-fn buf-name buffer-menu-filter--pattern))
                 ;; Ensure score is not `nil'
                 (score (cond ((listp scoring) (nth 0 scoring))
                              ((vectorp scoring) (aref scoring 0))
