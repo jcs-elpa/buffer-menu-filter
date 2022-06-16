@@ -1,10 +1,15 @@
+(package "buffer-menu-filter"
+         "0.1.0"
+		 "Filter buffer-menu items using fake header")
+
+(website-url "https://github.com/jcs-elpa/buffer-menu-filter")
+(keywords "buffer" "menu" "filter")
+
+(package-file "buffer-menu-filter.el")
+
 (source "jcs-elpa")
 (source "melpa")
 (source "gnu")
-
-(package "buffer-menu-filter" "0.1.0" "Filter buffer-menu items using fake header")
-
-(package-file "buffer-menu-filter.el")
 
 (depends-on "emacs" "26.1")
 (depends-on "buffer-menu-project")
