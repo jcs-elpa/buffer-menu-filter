@@ -3,7 +3,7 @@
 		 "Filter buffer-menu items using fake header")
 
 (website-url "https://github.com/jcs-elpa/buffer-menu-filter")
-(keywords "buffer" "menu" "filter")
+(keywords "convenience" "buffer" "menu" "filter")
 
 (package-file "buffer-menu-filter.el")
 
