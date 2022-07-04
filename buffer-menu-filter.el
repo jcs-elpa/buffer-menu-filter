@@ -7,7 +7,7 @@
 ;; URL: https://github.com/jcs-elpa/buffer-menu-filter
 ;; Version: 0.1.0
 ;; Package-Requires: ((emacs "26.1") (buffer-menu-project "0.1.0") (flx "0.6.1") (ht "2.0"))
-;; Keywords: buffer menu filter
+;; Keywords: convenience buffer menu filter
 
 ;; This file is NOT part of GNU Emacs.
 
