@@ -99,7 +99,7 @@ From scale 0 to 100.")
   "Assign this to `Buffer-menu-mode-hook'."
   (setq buffer-menu-filter--first-enter nil)
   (local-set-key (kbd "<return>") #'buffer-menu-filter-return)
-  (local-set-key (kbd "<backspace>") #'buffer-menu-filter-backspace)
+  (local-set-key (kbd "\177") #'buffer-menu-filter-backspace)
   (dolist (key-str buffer-menu-filter--key-list)
     (local-set-key key-str (lambda () (interactive) (buffer-menu-filter--input key-str)))))
 
