@@ -167,7 +167,7 @@ If BUFFER isn't showing; then execute ERROR operations instead."
 (defun buffer-menu-filter--display-help ()
   "Override function `buffer-menu--display-help'."
   (msgu-inhibit-log
-    (message "<INFO> Type something to start the filter")))
+    (message "[INFO] Type something to start the filter")))
 
 ;;
 ;; (@* "Search / Filter" )
