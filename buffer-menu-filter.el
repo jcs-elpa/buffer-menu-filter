@@ -122,7 +122,7 @@ From scale 0 to 100.")
 
 ;;;###autoload
 (define-minor-mode buffer-menu-filter-mode
-  "Minor mode 'buffer-menu-filter-mode'."
+  "Minor mode `buffer-menu-filter-mode'."
   :global t
   :require 'buffer-menu-filter-mode
   :group 'buffer-menu-filter
