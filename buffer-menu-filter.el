@@ -66,11 +66,8 @@
 
 (defcustom buffer-menu-filter-score-fn 'flx-score
   "Function used for scoring candidates."
-  :type 'symbol
+  :type 'function
   :group 'buffer-menu-filter)
-
-(defconst buffer-menu-filter-name "*Buffer List*"
-  "Buffer name for *Buffer List*.")
 
 (defvar buffer-menu-filter--first-enter nil
   "Record if fake header already appears.")
@@ -221,45 +218,45 @@ If BUFFER isn't showing; then execute ERROR operations instead."
   (while (< (line-number-at-pos) (line-number-at-pos (point-max)))
     (if (tabulated-list-get-id) (tabulated-list-delete-entry) (forward-line 1))))
 
-(defun buffer-menu-filter--filter-list ()
+(defun buffer-menu-filter--filter-list (buffer-name)
   "Do filtering the buffer list."
-  (let ((window-state-change-hook))
-    (buffer-menu-filter--jump-to-buffer-windows
-     buffer-menu-filter-name
-     :success
-     (lambda ()
-       (let ((scoring-table (ht-create)) scoring-keys)
-         (while (< (line-number-at-pos) (line-number-at-pos (point-max)))
-           (let* ((id (tabulated-list-get-id))
-                  (entry (tabulated-list-get-entry))
-                  (buf-name (buffer-name id))
-                  (scoring (funcall buffer-menu-filter-score-fn buf-name buffer-menu-filter--pattern))
-                  ;; Ensure score is not `nil'
-                  (score (cond ((listp scoring) (nth 0 scoring))
-                               ((vectorp scoring) (aref scoring 0))
-                               ((numberp scoring) scoring)
-                               (t 0))))
-             (when score
-               (push (cons id entry) (ht-get scoring-table score))))
-           (forward-line 1))
-         ;; Get all the keys into a list.
-         (ht-map (lambda (score-key _) (push score-key scoring-keys)) scoring-table)
-         (setq scoring-keys (sort scoring-keys #'>))  ; Sort keys in order
-         (buffer-menu-filter--clean)  ; Clean it
-         (dolist (key scoring-keys)
-           (when (< buffer-menu-filter--score-standard key)
-             (let ((ens (sort (ht-get scoring-table key)
-                              (lambda (en1 en2)
-                                (let ((en1-str (buffer-name (car en1)))
-                                      (en2-str (buffer-name (car en2))))
-                                  (string-lessp en1-str en2-str))))))
-               (dolist (en ens)
-                 (tabulated-list-print-entry (car en) (cdr en))))))
-         (buffer-menu-filter--goto-line 2))
-       (setq buffer-menu-filter--done-filtering t)
-       (buffer-menu-filter--safe-print-fake-header)
-       ;; Once it is done filtering, we redo return action if needed.
-       (when buffer-menu-filter--return-delay (buffer-menu-filter-return))))))
+  (buffer-menu-filter--jump-to-buffer-windows
+   buffer-name
+   :success
+   (lambda ()
+     (let ((scoring-table (ht-create)) scoring-keys)
+       (while (not (eobp))
+         (when-let* ((id (tabulated-list-get-id))
+                     (entry (tabulated-list-get-entry))
+                     (buf-name (buffer-name id))
+                     (scoring (funcall buffer-menu-filter-score-fn
+                                       buf-name
+                                       buffer-menu-filter--pattern))
+                     ;; Ensure score is not `nil'
+                     (score (cond ((listp scoring) (nth 0 scoring))
+                                  ((vectorp scoring) (aref scoring 0))
+                                  ((numberp scoring) scoring)
+                                  (t 0))))
+           (push (cons id entry) (ht-get scoring-table score)))
+         (forward-line 1))
+       ;; Get all the keys into a list.
+       (ht-map (lambda (score-key _) (push score-key scoring-keys)) scoring-table)
+       (setq scoring-keys (sort scoring-keys #'>))  ; Sort keys in order
+       (buffer-menu-filter--clean)  ; Clean it
+       (dolist (key scoring-keys)
+         (when (< buffer-menu-filter--score-standard key)
+           (let ((ens (sort (ht-get scoring-table key)
+                            (lambda (en1 en2)
+                              (let ((en1-str (buffer-name (car en1)))
+                                    (en2-str (buffer-name (car en2))))
+                                (string-lessp en1-str en2-str))))))
+             (dolist (en ens)
+               (tabulated-list-print-entry (car en) (cdr en))))))
+       (buffer-menu-filter--goto-line 2))
+     (setq buffer-menu-filter--done-filtering t)
+     (buffer-menu-filter--safe-print-fake-header)
+     ;; Once it is done filtering, we redo return action if needed.
+     (when buffer-menu-filter--return-delay (buffer-menu-filter-return)))))
 
 (defun buffer-menu-filter--update-header-string ()
   "Update the header string."
@@ -283,7 +280,8 @@ If BUFFER isn't showing; then execute ERROR operations instead."
     (setq buffer-menu-filter--done-filtering nil
           buffer-menu-filter--timer
           (run-with-idle-timer buffer-menu-filter-delay
-                               nil #'buffer-menu-filter--filter-list))))
+                               nil #'buffer-menu-filter--filter-list
+                               (buffer-name)))))
 
 (defun buffer-menu-filter--input (key-input &optional add-del-num)
   "Insert key KEY-INPUT for fake header for search bar.
