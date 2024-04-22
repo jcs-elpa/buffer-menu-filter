@@ -144,21 +144,20 @@ From scale 0 to 100.")
   "Goto LN line number."
   (goto-char (point-min)) (forward-line (1- ln)))
 
-(defun buffer-menu-filter--window-list (query)
-  "Return window list by it's QUERY."
-  (cl-remove-if-not
-   (lambda (win) (string-match-p query (buffer-name (window-buffer win))))
-   (window-list)))
-
 (cl-defun buffer-menu-filter--jump-to-buffer-windows (buffer &key success error)
   "Safely jump to BUFFER's window and execute SUCCESS operations.
 
 If BUFFER isn't showing; then execute ERROR operations instead."
-  (if-let ((windows (buffer-menu-filter--window-list buffer)))
+  (if-let ((windows (get-buffer-window-list buffer)))
       (dolist (win windows)
         (with-selected-window win
           (when success (funcall success))))
     (when error (funcall error))))
+
+(defun buffer-menu-filter--kill-timer-filter ()
+  "Kill the filter timer."
+  (setq buffer-menu-filter--timer
+        (buffer-menu-filter--kill-timer buffer-menu-filter--timer)))
 
 ;;
 ;; (@* "Help" )
@@ -192,6 +191,18 @@ If BUFFER isn't showing; then execute ERROR operations instead."
 
 
 ;;;###autoload
+(defun buffer-menu-filter-refresh-preserve ()
+  "Refresh `buffer-menu' table but preserve search string."
+  (interactive)
+  (let ((header-string tabulated-list--header-string))
+    (msgu-silent (buffer-menu))
+    (setq-local tabulated-list--header-string header-string)
+    (buffer-menu-filter--update-header-string))
+  (unless (string-empty-p buffer-menu-filter--pattern)
+    (buffer-menu-filter--kill-timer-filter)
+    (buffer-menu-filter--filter-list)))
+
+;;;###autoload
 (defun buffer-menu-filter-refresh ()
   "Refresh `buffer-menu' table."
   (interactive)
@@ -212,42 +223,43 @@ If BUFFER isn't showing; then execute ERROR operations instead."
 
 (defun buffer-menu-filter--filter-list ()
   "Do filtering the buffer list."
-  (buffer-menu-filter--jump-to-buffer-windows
-   buffer-menu-filter-name
-   :success
-   (lambda ()
-     (let ((scoring-table (ht-create)) scoring-keys)
-       (while (< (line-number-at-pos) (line-number-at-pos (point-max)))
-         (let* ((id (tabulated-list-get-id))
-                (entry (tabulated-list-get-entry))
-                (buf-name (buffer-name id))
-                (scoring (funcall buffer-menu-filter-score-fn buf-name buffer-menu-filter--pattern))
-                ;; Ensure score is not `nil'
-                (score (cond ((listp scoring) (nth 0 scoring))
-                             ((vectorp scoring) (aref scoring 0))
-                             ((numberp scoring) scoring)
-                             (t 0))))
-           (when score
-             (push (cons id entry) (ht-get scoring-table score))))
-         (forward-line 1))
-       ;; Get all the keys into a list.
-       (ht-map (lambda (score-key _) (push score-key scoring-keys)) scoring-table)
-       (setq scoring-keys (sort scoring-keys #'>))  ; Sort keys in order
-       (buffer-menu-filter--clean)  ; Clean it
-       (dolist (key scoring-keys)
-         (when (< buffer-menu-filter--score-standard key)
-           (let ((ens (sort (ht-get scoring-table key)
-                            (lambda (en1 en2)
-                              (let ((en1-str (buffer-name (car en1)))
-                                    (en2-str (buffer-name (car en2))))
-                                (string-lessp en1-str en2-str))))))
-             (dolist (en ens)
-               (tabulated-list-print-entry (car en) (cdr en))))))
-       (buffer-menu-filter--goto-line 2))
-     (setq buffer-menu-filter--done-filtering t)
-     (buffer-menu-filter--safe-print-fake-header)
-     ;; Once it is done filtering, we redo return action if needed.
-     (when buffer-menu-filter--return-delay (buffer-menu-filter-return)))))
+  (let ((window-state-change-hook))
+    (buffer-menu-filter--jump-to-buffer-windows
+     buffer-menu-filter-name
+     :success
+     (lambda ()
+       (let ((scoring-table (ht-create)) scoring-keys)
+         (while (< (line-number-at-pos) (line-number-at-pos (point-max)))
+           (let* ((id (tabulated-list-get-id))
+                  (entry (tabulated-list-get-entry))
+                  (buf-name (buffer-name id))
+                  (scoring (funcall buffer-menu-filter-score-fn buf-name buffer-menu-filter--pattern))
+                  ;; Ensure score is not `nil'
+                  (score (cond ((listp scoring) (nth 0 scoring))
+                               ((vectorp scoring) (aref scoring 0))
+                               ((numberp scoring) scoring)
+                               (t 0))))
+             (when score
+               (push (cons id entry) (ht-get scoring-table score))))
+           (forward-line 1))
+         ;; Get all the keys into a list.
+         (ht-map (lambda (score-key _) (push score-key scoring-keys)) scoring-table)
+         (setq scoring-keys (sort scoring-keys #'>))  ; Sort keys in order
+         (buffer-menu-filter--clean)  ; Clean it
+         (dolist (key scoring-keys)
+           (when (< buffer-menu-filter--score-standard key)
+             (let ((ens (sort (ht-get scoring-table key)
+                              (lambda (en1 en2)
+                                (let ((en1-str (buffer-name (car en1)))
+                                      (en2-str (buffer-name (car en2))))
+                                  (string-lessp en1-str en2-str))))))
+               (dolist (en ens)
+                 (tabulated-list-print-entry (car en) (cdr en))))))
+         (buffer-menu-filter--goto-line 2))
+       (setq buffer-menu-filter--done-filtering t)
+       (buffer-menu-filter--safe-print-fake-header)
+       ;; Once it is done filtering, we redo return action if needed.
+       (when buffer-menu-filter--return-delay (buffer-menu-filter-return))))))
 
 (defun buffer-menu-filter--update-header-string ()
   "Update the header string."
@@ -266,9 +278,9 @@ If BUFFER isn't showing; then execute ERROR operations instead."
   (tabulated-list-revert)
   (buffer-menu-filter--update-header-string)
   (buffer-menu-filter--safe-print-fake-header)
+  (buffer-menu-filter--kill-timer-filter)
   (unless (string-empty-p buffer-menu-filter--pattern)
-    (setq buffer-menu-filter--timer (buffer-menu-filter--kill-timer buffer-menu-filter--timer)
-          buffer-menu-filter--done-filtering nil
+    (setq buffer-menu-filter--done-filtering nil
           buffer-menu-filter--timer
           (run-with-idle-timer buffer-menu-filter-delay
                                nil #'buffer-menu-filter--filter-list))))
