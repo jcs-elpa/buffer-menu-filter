@@ -69,6 +69,9 @@
   :type 'function
   :group 'buffer-menu-filter)
 
+(defvar buffer-menu-filter-name "*Buffer List*"
+  "Buffer name for *Buffer List*.")
+
 (defvar buffer-menu-filter--first-enter nil
   "Record if fake header already appears.")
 
@@ -218,10 +221,10 @@ If BUFFER isn't showing; then execute ERROR operations instead."
   (while (< (line-number-at-pos) (line-number-at-pos (point-max)))
     (if (tabulated-list-get-id) (tabulated-list-delete-entry) (forward-line 1))))
 
-(defun buffer-menu-filter--filter-list (buffer-name)
+(defun buffer-menu-filter--filter-list (&optional buffer-name)
   "Do filtering the buffer list."
   (buffer-menu-filter--jump-to-buffer-windows
-   buffer-name
+   (or buffer-name buffer-menu-filter-name)
    :success
    (lambda ()
      (let ((scoring-table (ht-create)) scoring-keys)
