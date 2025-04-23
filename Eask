@@ -1,3 +1,5 @@
+;; -*- mode: eask; lexical-binding: t -*-
+
 (package "buffer-menu-filter"
          "0.1.0"
          "Filter buffer-menu items using fake header")
